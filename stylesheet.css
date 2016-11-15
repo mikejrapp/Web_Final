@@ -1,0 +1,87 @@
+html , body{
+	margin: 0px;
+	padding: 0px;
+	background-color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 105%; /*Thought it was hard to read with smaller font.*/
+}
+
+
+
+.titleBar{
+	width: 100%;
+	height: 100px;
+	background-color: black;
+	color: white;
+	background-color: #485c3c;
+	position: fixed;
+	margin-top: -25px;
+	z-index: 999;
+}
+
+.login{
+	position: fixed;
+	width: 110px;
+	margin-left: 30px;
+	margin-top: 175px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #9CA485;
+}
+
+.login input{
+	margin-top: 10px;
+	display: block;
+}
+
+.button{
+	margin-top: 10px;
+}
+
+.description{
+	width: 70%;
+	margin-top: 25px;
+	padding-top: 100px;
+	text-align: justify;
+	margin-left: auto;
+	margin-right: auto;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #9CA485;
+}
+
+.bottom{
+	width: 75%;
+	margin-top: 25px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.bottomLeft, .bottomRight{
+	width: 45%;
+	margin-left: 2%;
+	margin-right: 2%;
+	text-align: justify;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #9CA485;
+	float: left;
+}
+
+.bottomRight img{
+	margin-left: 25%;
+}
+
+.header{
+	text-align: center;
+}
+
+a:link{
+	color: #5C6D55;
+}
+
+a:visited{
+	color: #5B6F6B;
+}
+
+.gameTitles{
+	font-size: 110%;
+	font-style: italic;
+}

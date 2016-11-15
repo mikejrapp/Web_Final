@@ -1,0 +1,133 @@
+body, html {
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: #333333;
+	color: #9CA485;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 105%;
+}
+
+input[type=button]{
+	margin-left: 10px;
+}
+
+.introDiv{
+	position: absolute;
+	left: 600px;
+	top: 400px;
+	width: 300px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.titleBar{
+	z-index: 999;
+	position: absolute;
+	width: 100%;
+	height: 100px;
+	background-color: black;
+	background-color: #485c3c;
+	margin-top: 0px;
+}
+
+.warriorImg, .rogueImg, .rangerImg, .mageImg{
+	height: 500px;
+	width: 250px;
+	padding-left: 15px;
+}
+
+.main{
+	position: abosolute;
+	width: 1200px;
+	height: 1200px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 100px;
+	/* border-style: solid;
+	border-color: white; */
+}
+
+.buttonDiv {
+	display: inline-block;
+	position: absolute;
+	width: 120px;
+	height: 300px;
+	/* border-style: solid;
+	border-color: black; */
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
+.tableDiv{
+	display: inline-block;
+	position: absolute;
+	margin-left: 155px;
+	/* border-style: solid;
+	border-color: black; */
+	width: 550px;
+	height: 550px;
+}
+
+.table {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.infoDiv{
+	display: inline-block;
+	position: absolute;
+	position: absolute;
+	width: 400px;
+	height: 600px;
+	margin-left: 750px;
+	/* border-style: solid;
+	border-color: black; */
+}
+
+.infoDiv p, h2{
+	text-align: center;
+}
+
+.button{
+	display: block;
+	margin-top: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.field{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.charImage{
+	height: 600px;
+	width: 400px;
+}
+
+td {
+	height: 50px;
+	width: 50px;
+}
+
+.X {
+	background-color: black;
+}
+
+.O {
+	background-color: gray;
+}
+
+.W1, .R1, .Ra1, .M1 {
+	background-color: green;
+}
+
+.W2, .R2, .Ra2, .M2{
+	background-color: red;
+}

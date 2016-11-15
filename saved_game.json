@@ -1,0 +1,56 @@
+[
+{"game":{
+	"round":2,
+	"turn":1,
+	"size":8
+}},
+{"player1":
+	{
+		"name":"Arthur Dent",
+		"turn":1,
+		"charList":
+		[
+			{"char1":
+				{
+					"charType":"Warrior",
+					"isDead":"false",
+					"isStunned":"false",
+					"currentHP":800,
+					"currentAP":2,
+					"position":"33"
+				}
+			},
+			{"char2":
+				{
+					"charType":"Rogue",
+					"isDead":"false",
+					"isStunned":"false",
+					"currentHP":280,
+					"currentAP":3,
+					"position":"52"
+				}
+			}
+		]
+	}
+	
+},
+{"player2":
+	{
+		"name":"Zaphod Beeblebrox",
+		"turn":2,
+		"charList":
+		[
+			{"char1":
+				{
+					"charType":"Warrior",
+					"isDead":"false",
+					"isStunned":"false",
+					"currentHP":900,
+					"currentAP":3,
+					"position":"32"
+				}
+			}
+		]
+	}
+}
+]

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="game_state_stylesheet.css">
+		<title>Game State</title>
+	</head>
+	<body>
+		<div class = "titleBar">
+			<a href="index.html"><img src="Images/moldy_basement.jpg"></a>
+		</div>
+		
+		<div class="main">
+			<h1 class="header">Game State</h1>
+			<p>
+				Here is a sample of the game state of the game in progress.
+			</p>
+			<h3>Game Grid</h3>
+			<span class="grid"><p>gameGrid = [["M1"," "," "," "," ",],[" ","X","X"," "," ",],[" ","X"," ","P2"," ",],[" "," "," ","X","X",],[" "," "," ","P1"," ",]]</p></span>
+			<h3>Game Variables</h3>
+			<ul>
+				<li>isGameOver = false</li>
+				<li>round = 2</li>
+				<li>turn = 2 (Player turn)</li>
+				<li>initiativeCounter = 2</li>
+				<li>initiativeOrderPlayer = [playerCharater2, playerCharacter1]</li>
+				<li>initiativeOrderAI = [aiCharacter1]</li>
+			</ul>
+			<h3>Objects</h3>
+			<h4>Warrior (playerCharacter2)</h4>
+			<ul>
+				<p>Inherited from Character class</p>
+				<li>isDead = false</li>
+				<li>isStunned = fasle</li>
+				<li>healthPoints = 1000</li>
+				<li>actionPoints = 3</li>
+				<li>attack = 50</li>
+				<li>initiative = 1</li>
+				<li>moveSpeed = 2</li>
+				<li>attackRange = 1</li>
+				<li>currentHP = 1000</li>
+				<li>currentAP = 1 (used 2 to move to current location)</li>
+				<p>Warrior class variables</p>
+				<li>isTaunting = false</li>
+				<li>isBlocking = false</li>
+			</ul>
+			<h4>Ranger (playerCharacter1)</h4>
+			<ul>
+				<p>Inherited from Character class</p>
+				<li>isDead = false</li>
+				<li>isStunned = fasle</li>
+				<li>healthPoints = 250</li>
+				<li>actionPoints = 4</li>
+				<li>attack = 150</li>
+				<li>initiative = 2</li>
+				<li>moveSpeed = 3</li>
+				<li>attackRange = 3</li>
+				<li>currentHP = 250</li>
+				<li>currentAP = 3</li>
+				<p>Ranger class variable</p>
+				<li>isChargingAttack = false</li>
+			</ul>
+			<h4>Rogue (aiCharacter1)</h4>
+			<ul>
+				<p>Inherited from Character class</p>
+				<li>isDead = false</li>
+				<li>isStunned = fasle</li>
+				<li>healthPoints = 500</li>
+				<li>actionPoints = 5</li>
+				<li>attack = 100</li>
+				<li>initiative = 1</li>
+				<li>moveSpeed = 3</li>
+				<li>attackRange = 1</li>
+				<li>currentHP = 500</li>
+				<li>currentAP = 0 (used 2 last round to move and 3 to use special ability. Resets at beginning of round)</li>
+				<p>Rogue class variable</p>
+				<li>isChargingAttack = true (used special ability to get bonus damage next round)</li>
+			</ul>
+			
+		</div>
+	</body>
+</html>

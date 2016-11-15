@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Software Design</title>
+		<link rel="stylesheet" type="text/css" href="grid_stylesheet.css">
+	</head>
+	<body>
+		<div class = "titleBar">
+			<a href="index.html"><img src="Images/moldy_basement.jpg"></a>
+		</div>
+	
+		<div id="modelDiv" class="modelDiv">
+			<h1>Assigment 3 Software Design</h1>
+			<h2>Model</h2>
+			
+			<h3>Game</h3>
+			<p>The Game object controls the game state and logic</p>
+			<h3>Game Variables</h3>
+			<ul>
+				<li>isGameOver: a boolean value which determines wheter the game has ended.</li>
+				<li>round: an integer value which keeps track of the rounds of the game.</li>
+				<li>turn: an intger value wich keeps track of player turns within a round.</li>
+				<li>turnOrder: an array the holds player objects in their turn order.</li>
+				<li>grid: a two dimensional array that holds the data for the "board" of the game.</li>
+				<li>gridSize: an integer value which determines the size of the grid (based on player choice).</li>
+			</ul>
+			<h3>Game Functions</h3>
+			<ul>
+				<li>initializeGame(player1,player2,size): this function sets the beginning of the game. It sets round and turn to 1
+					determines the turn order and sets up the grid.
+				</li>
+				<li>reset(size): this function brings the game back to the first round keeping the turn order established by initializeGame.</li>
+				<li>setGrid(size): this function creates the two dimensional array that is the game grid.</li>
+				<li>setObstacles(size,i,j): this function is used with other functions to establish fixed obstacle tiles based on the grid size.<li>
+				<li>getGridSize(): this function returns the grid size.</li>
+				<li>getGridIndex(i,j): this function returns the value of stored in the grid array at index i and index j.</li>
+				<li>setTurnOrder(player1,player2): this function simulates a coin toss to determine which player goes first.</li>
+				<li>placeToken(character,indexI,indexJ): this function places a charcter in the grid array at the 
+					specified indexes.
+				</li>
+				<li>updateGrid(character, pos): this function moves the specified character to the position pos in the array.
+					pos is passed as a string which is parsed for the i and j indexes.
+				</li>
+				<li>updateGameState(pGameOver,pRound,pTurn): this function updates the round and turn for the game as well as the
+					isGameOver boolean.
+				</li>
+				<li>combat(char1,char2,): this function handles character combat between char1 and char2.</li>
+				<li>spclAbl(char): this function handles a character using it's special ability. Toggling special abilities 
+					in the character object and updating the grid if applicable.
+				</li>
+			</ul>
+			
+			<h3>Player</h3>
+			<p>Each game will have two player objects.</p>
+			<h3>Player Variables</h3>
+			<ul>
+				<li>playerName: a string value that will have the players name.</li>
+				<li>playerNumber: an interger value that will represent whether the player is player 1 or 2</li>
+				<li>playerType: a string value that will determine if the player is a human or computer player</li>
+				<li>characters: an array which stores the players character objects.</li>
+			</ul>
+			<h3>Player Functions</h3>
+			<ul>
+				<li>addChar(character): this function will add a character object to the players list of characters.</li>
+				<li>getName(): this function will return the players name.</li>
+				<li>getPlayerNumber(): this function returns the players number.</li>
+				<li>getPlayerType(): this function returns the players type.</li>
+				<li>getCharacter(pos): this function will return a character object from the pos position in the characters list</li>
+			</ul>
+			
+			<h3>Character</h3>
+			<p>Each player will have at least one character that they control.</p>
+			<p>There are 4 classes of characters which inherit the character class</p>
+			<p>Each character has the following properties:</p>
+			<h3>Character Variables</h3>
+			<ul>
+				<li>token: a string value which marks the character for use on the grid.</li>
+				<li>isDead: a boolean value which states whether the character is dead.</li>
+				<li>isStunned: a boolean value which states wheter the character is stunned.</li>
+				<li>healthPoints: an integer value for the characters health points.</li>
+				<li>actionPoints: an integer value that governs the amount of moves/actions a character can 
+					make in a turn.
+				</li>
+				<li>attack: an interger value that determines the maximun damage a character can do in combat.</li>
+				<li>initiative: an interger value that determines when the character can move, attack or use
+					a special ability during the players turn.
+				</li>
+				<li>moveSpeed: an integer value that determines the amount of tiles a character can move in a turn.</li>
+				<li>attackRange: an integer value that determines how many tiles away from the characters current position	
+					they can attack.
+				</li>
+				<li>currentHP: an integer value which has a maximum equal to healthPoints. If this number reaches 0 or less
+					isDead will be set to true.
+				</li>
+				<li>currentAP: an integer value that has a maximum equal to actionPoints. If this number reaches 0 or less
+					the characters turn is over.
+				</li>
+				<li>specialAbilities: an array that stores the characters special ability list as string values.</li>
+				<li>position: a string value that holds the characters current board position. The first number is the y
+					position on the grid (or i index) and the second number is the x position (or j index).
+				</li>
+			</ul>
+			<h3>Character functions</h3>
+			<ul>
+				<li>initChar(token,HP,AP,atk,init,mvSpd,atkRng,abl1,abl2): This function acts almost like a constructor. It is used
+					to initialize a character object with the basic values needed. It does not change the characters board position.
+				</li>
+				<li>setDeath(deathState): this function is used to toggle the isDead variable. If the characters currentHP variable
+					is equal to 0 or less, this function will be called to set the isDead variable to true. It can also be used to "revive"
+					a dead character by setting isDead to false.
+				</li>
+				<li>setStun(stunState): this function is used to toggle the isStunned variable.</li>
+				<li>getHP(),getAP(),getAttack(),getInit(),getMvSpd(),getAtkRng(),getCurrentHP(),getCurrentAP(),getToken(): These all return
+					their respective variable for use with other functions and objects.
+				</li>
+				<li>getSpecialAbl(pos): this function will retrieve and return the special ability from the list at pos.</li>
+				<li>setPosition(indexI,indexJ): this function will set the characters board position to indexI (y value) to 
+					indexJ (x value).
+				</li>
+				<li>getPosition(): this function will return the characters current board position.</li>
+			</ul>
+			
+			<h3>Warrior: inherits Character</h3>
+			<p>The Warrior class has the following unique properties:</p>
+			<h3>Warrior Variables</h3>
+			<ul>
+				<li>className: this is a string value which contains the name of the class</li>
+				<li>isTaunting: a boolean value which determines whether the warriors special ability "taunt" is active</li>
+				<li>isBlocking: a boolean value which determines wheter the warriors special ability "block" is active</li>
+			</ul>
+			<h3>Warrior function</h3>
+			<ul>
+				<li>getClassName(): this function returns the class name of the Warrior.</li>
+				<li>setTaunt(tauntState): this function turns the taunt ability on or off</li>
+				<li>setBlock(blockState): this funciton turns the block ability on or off</li>
+			</ul>
+			
+			<h3>Rogue: inherits Character</h3>
+			<h3>Rogue Variables</h3>
+			<ul>
+				<li>isCharging: a boolean variable that determines if the rogue is charging a special ability.</li>
+			</uL>
+			<h3>Rogue Function</h3>
+			<ul>
+				<li>setCharge(chargeState): this function will set a charged ability on or off.</li>
+			</ul>
+			
+			<h3>Ranger: inherits Character</h3>
+			<h3>Ranger Variables</h3>
+			<ul>
+				<li>isCharging: a boolean variable that determines if the ranger is charging a special ability.</li>
+			</ul>
+			<h3>Ranger Functions</h3>
+			<ul>
+				<li>setCharge(chargeState): this function will set a charged ability on or off.</li>
+			</ul>
+			<h3>Mage: inherits Character</h3>
+			<h3>Mage Variables</h3>
+			<ul>
+				<li>no unique</li>
+			</ul>
+		</div>
+	</body>
+</html>
