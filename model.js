@@ -286,39 +286,9 @@ function Game(){
 		return this.round;
 	}
 	
-
-	
-	/* this.roundLoop = function(player1, player2){
-		var isEnd = false;
-		
-		
+	this.combat(attackingCharacter,defendingCharacter){
+		//add combat handler
 	}
-	
-	this.turnLoop = function(player){
-		//var isEnd = false;
-		var piecesPlaced = player.getCharTotal();
-		var title = document.getElementById("title");
-		var info = document.getElementById("info");
-		
-		var buttonEnd = document.createElement("button");
-		buttonEnd.id = "buttonEnd";
-		buttonEnd.className = "buttonEnd";
-		buttonEnd.innerHTML = "End Turn";
-		buttonEnd.addEventListener("click",function(){
-			isEnd = true;
-		});
-		document.getElementById("infoDiv").appendChild(buttonEnd);
-		
-		title.innerText = "it is " + player.getName() + "'s turn. \nit is turn: " + this.turn;
-		if(this.round == 1){
-			while(piecesPlaced < player.getCharTotal()){
-				info.innerText = "Please place a piece";
-			}
-		}
-		
-		
-		
-	} */
 	/**************************************************
 		combat function needed
 		special ability function needed
@@ -414,6 +384,7 @@ function Player(pName,pNumber,pType){
 		}
 		
 	}
+
 }
 	
 function Character(){
@@ -430,8 +401,9 @@ function Character(){
 	this.currentAP;
 	this.specialAbilities = new Array();
 	this.position;
+	this.owner //<-- var to determine who the character belongs to
 	
-	this.initChar = function(token,HP,AP,atk,init,mvSpd,atkRng,abl1,abl2){
+	this.initChar = function(token,HP,AP,atk,init,mvSpd,atkRng,abl1,abl2,pOwner){
 		//this is more intended to be used after creating an object which inherits this.
 		this.token = token;
 		this.isDead = false;
@@ -446,6 +418,7 @@ function Character(){
 		this.attackRange = atkRng;
 		this.specialAbilities.push(abl1);
 		this.specialAbilities.push(abl2);
+		this.owner = pOwner;
 	}
 	
 	this.setDeath = function(deathState){
@@ -462,6 +435,10 @@ function Character(){
 	
 	this.setCurrentAP = function(AP){
 		this.currentAP = AP;
+	}
+	
+	this.setOwner = function(pOwner){
+		this.owner = pOwner;
 	}
 	
 	this.getToken = function(){
@@ -514,6 +491,10 @@ function Character(){
 	
 	this.getPosition = function(){
 		return this.position;
+	}
+	
+	this.getOwner = function(){
+		return this.owner;
 	}
 }
 	
