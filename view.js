@@ -325,7 +325,7 @@ function addCharacters(pPlayer,character){
 	}
 	if(character == "Rogue"){
 		playerChar = new Rogue();
-		playerChar.initChar("R" + pPlayer.getPlayerNumber().toString(),500,5,1000,0,3,1,"Leap","Precision Strike",pPlayer.getName());
+		playerChar.initChar("R" + pPlayer.getPlayerNumber().toString(),500,5,100,0,3,1,"Leap","Precision Strike",pPlayer.getName());
 	}
 	if(character == "Ranger"){
 		playerChar = new Ranger();
@@ -758,6 +758,8 @@ function attackCharacter(tile,game,character,player){
 	var buttonCancel;
 	var info = document.getElementById("info");
 	var title = document.getElementById("title");
+	var defendingCharacter;
+	//var attackingCharacter = player.getCharByToken(character);
 	
 	removeButton("buttonMove","infoDiv");
 	removeButton("buttonAttack","infoDiv");
@@ -773,8 +775,20 @@ function attackCharacter(tile,game,character,player){
 	buttonCancel = document.getElementById("buttonCancel");
 	
 	buttonConfirm.addEventListener("click",function(){
-		info.innerHTML = "Event coming soon!";
-		//game.combat is started but not finished...
+		var damageDone;
+		var attackerRange = character.getAtkRng();
+		var yDifference = Math.abs(defendingCharacter.getPosition().slice(0,1) - character.getPosition().slice(0,1));
+		var xDifference = Math.abs(defendingCharacter.getPosition().slice(1,2) - character.getPosition().slice(1,2));
+		
+		if(yDifference <= attackerRange && xDifference <= attackerRange){
+			damageDone = game.combat(character,defendingCharacter);
+			info.innerHTML = "Total damage done to enemy: " + damageDone;
+		}
+		else{
+			info.innerHTML = "Target is too far!";
+		}
+		
+		
 	});
 	buttonCancel.addEventListener("click",function(){
 		removeButton("buttonConfirm","infoDiv");
@@ -791,9 +805,9 @@ function attackCharacter(tile,game,character,player){
 			td.addEventListener("click",function(){
 				if(this.className != "O" && this.className != "X" && this.className.slice(1,2) != player.getPlayerNumber()){
 					info.innerHTML = "Attack " + this.parentNode.rowIndex + this.cellIndex + "?";
-					destinationTile = this;
+					defendingCharacter = game.getPlayer(this.className.slice(1,2) - 1).getCharByToken(this.className);
 				}
-				if(this.className.slice(1,2) == player.getPlayerNumber()){
+				if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
 					removeGrid();
 					drawGrid(game,"tableDiv");
 					drawCharOptButtons(tile,game,player);

@@ -286,11 +286,46 @@ function Game(){
 		return this.round;
 	}
 	
-	this.combat(attackingCharacter,defendingCharacter){
+	this.combat = function(attackingCharacter,defendingCharacter){
 		//add combat handler
+		var attackValue = attackingCharacter.getAttack();
+		var defenseHP = defendingCharacter.getCurrentHP();
+		var attackRoll = Math.floor((Math.random() * 100) + 1);
+		var damageRoll = Math.floor((Math.random() * 5) + 1);
+		var damage;
+		
+		//need checks for special abilities and conditional modifiers
+		
+		if(attackRoll >= 75){
+			//max damage
+			damage = attackValue;
+			defendingCharacter.setCurrentHP(defenseHP - damage);
+			
+		}
+		else if(attackRoll >= 50 && attackRoll < 75){
+			// 3/4 damage + damageRoll
+			damage = Math.round(attackValue * .75) + damageRoll;
+			defendingCharacter.setCurrentHP(defenseHP - damage);
+		}
+		else if(attackRoll >= 25 && attackRoll < 50){
+			// 1/4 damage + damageRoll
+			damage = Math.round(attackValue * .25) + damageRoll;
+			defendingCharacter.setCurrentHP(defenseHP - damage);
+		}
+		else{
+			//no damage
+			damage = 0;
+		}
+		
+		if(defendingCharacter.getCurrentHP() <= 0){//das kind war tot
+			defendingCharacter.setDeath(true);
+		}
+		
+		return damage;
+		
 	}
+	
 	/**************************************************
-		combat function needed
 		special ability function needed
 	***************************************************/
 	
@@ -466,7 +501,7 @@ function Character(){
 	}
 	
 	this.getAtkRng = function(){
-		return this.moveSpeed;
+		return this.attackRange;
 	}
 	
 	this.getCurrentHP = function(){
