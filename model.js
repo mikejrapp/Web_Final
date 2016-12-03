@@ -295,6 +295,20 @@ function Game(){
 		var damage;
 		
 		//need checks for special abilities and conditional modifiers
+		if(attackingCharacter.getClassName() == "Rogue"){
+			if(attackingCharacter.getPrecisionStrikeState() == true){
+				damge = attackingCharacter.precisionStrike();
+				if(damage > 0 && attackRoll < 25){//if attack roll failed, but crit did not
+					attackRoll = 25;
+				}
+			}
+		}
+		
+		if(defendingCharacter.getClassName() == "Warrior"){
+			if(defendingCharacter.getBlockState() == true){
+				
+			}
+		}
 		
 		if(attackRoll >= 75){
 			//max damage
@@ -535,30 +549,71 @@ function Character(){
 	
 function Warrior(){
 	this.className = "Warrior";
-	this.isTaunting;
-	this.isBlocking;
-	
-	this.getClassName = function(){
-		return this.className;
-	}
+	this.isTaunting = false;
+	this.isBlocking = false;
 	
 	this.setTaunt = function(tauntState){
 		this.isTaunting = tauntState;
 	}
 	
-	//setBlock
-}
+	this.setBlock = function(blockState){
+		this.isBlocking = bloskState;
+	}
 	
-	Warrior.prototype = new Character();
+	/*this.getTauntState(){
+		return this.isTaunting;
+	}
 	
-function Rogue(){
-	this.className = "Rogue";
+	this.getBlockState(){
+		return this.isBlocking;
+	}*/
 	
 	this.getClassName = function(){
 		return this.className;
 	}
 	
-	//set
+	/*this.block(){
+		//add block
+	}*/
+}
+	
+	Warrior.prototype = new Character();
+	
+function Rogue(){
+	this.isPrecisionStrikOn = false;
+	this.className = "Rogue";
+	
+	this.setPrecisionStrike = function(precisionStrikeState){
+		this.isPrecisionStrike = precisionStrikeState;
+	}
+	
+	this.getClassName = function(){
+		return this.className;
+	}
+	
+	this.getPrecisionStrikeState = function(){
+		return this.precisionStrike;
+	}
+	
+	this.precisionStrike = function(){
+		//should be a garuanteed hit (between 1/4 and 1) + small amount of bonus damage
+		var critChance = Math.floor((Math.random() * 100) + 1);
+		var bonusDamage = 20;
+		
+		if(critChance > 66){
+			return bonusDamage;
+		}
+		else{
+			return 0;
+		}
+	}
+	
+	this.leap = function(targetTile){
+		//need to setup to analyze target tile vs char current AP
+		//analyze whether target tyle is vertical or horizontal move
+		
+		
+	}
 }
 
 	Rogue.prototype = new Character();
