@@ -19,7 +19,7 @@ function introAnimation(){
 	if(introDiv.style.top == "-400px"){
 		var game = new Game();
 		drawButtons("buttonDiv",game);
-		addLocalStorageClear();
+		//addLocalStorageClear();
 	}
 }
 
@@ -308,7 +308,7 @@ function loadGame(pP1Name,pP2Name,game){
 		game.updateTurnOrder(playerTwo,playerOne);
 	}
 	
-	
+	removeButton("buttonPlay","buttonDiv");
 	drawGrid(game,"tableDiv");
 	
 	title.innerHTML = "Welcome back!";
@@ -388,43 +388,11 @@ function removeGrid(){
 }
 
 function drawButtons(div,game){
-	//var isMapDrawn = false;
-	
-/* 	var button5 = document.createElement("button");
-	var button8 = document.createElement("button");
-	var button10 = document.createElement("button");
-	var buttonUpdate = document.createElement("button");
-	var buttonPieces = document.createElement("button"); */
+
 	var buttonDiv = document.getElementById(div);
 	var buttonPlay = document.createElement("button");
 	var buttonLoad = document.createElement("button");
 	var buttonReset = document.createElement("button");
-	/* button5.id = "button5";
-	button5.className = "button";
-	button5.innerHTML = "Generate 5x5";
-	button5.addEventListener("click", function(){
-		buttonEvent(div,game,player1,player2,5);
-		isMapDrawn = true;
-	})
-	buttonDiv.appendChild(button5);
-	
-	button8.id = "button8";
-	button8.className = "button";
-	button8.innerHTML = "Generate 8x8";
-	button8.addEventListener("click", function(){
-		buttonEvent(div,game,player1,player2,8);
-		isMapDrawn = true;
-	})
-	buttonDiv.appendChild(button8);
-	
-	button10.id = "button10";
-	button10.className = "button";
-	button10.innerHTML = "Generate 10x10";
-	button10.addEventListener("click",function(){
-		buttonEvent(div,game,player1,player2,10);
-		isMapDrawn = true;
-	})
-	buttonDiv.appendChild(button10); */
 	
 
 	buttonPlay.innerHTML = "Play";
@@ -433,15 +401,6 @@ function drawButtons(div,game){
 	buttonPlay.addEventListener("click",function(){
 		buttonPlay.style.visibility = "hidden";
 		playerSetup(game,"infoDiv");
-		/* if(isMapDrawn == true){
-			var title = document.getElementById("title");
-			var info = document.getElementById("info");
-			
-			console.log(game.getTurn() - 1);
-			console.log(game.turnOrder[game.getTurn() - 1].getName());
-			title.innerText = game.turnOrder[game.getTurn() - 1].getName() + "'s turn! \nPlease place a character";
-		} */
-
 	});
 	buttonDiv.appendChild(buttonPlay);
 
@@ -501,6 +460,7 @@ function drawCharOptButtons(tile,game,player){
 	var buttonAttack;// = document.createElement("button");
 	var buttonMove;// = document.createElement("button");
 	var buttonSpecialAbility;// = document.createElement("button");
+	var buttonEndTurn;
 	var info = document.getElementById("info");
 	var title = document.getElementById("title");
 	var character = player.getCharByToken(tile.className);
@@ -510,6 +470,7 @@ function drawCharOptButtons(tile,game,player){
 	removeButton("buttonSpecialAbility","infoDiv");
 	removeButton("buttonConfirm","infoDiv");
 	removeButton("buttonCancel","infoDiv");
+	removeButton("buttonEndTurn","buttonDiv");
 	
 	drawButton("buttonMove","infoDiv","Move");
 	buttonMove = document.getElementById("buttonMove");
@@ -525,7 +486,13 @@ function drawCharOptButtons(tile,game,player){
 	drawButton("buttonAttack","infoDiv","Attack");
 	buttonAttack = document.getElementById("buttonAttack");
 	buttonAttack.addEventListener("click",function(){
-		attackCharacter(tile,game,character,player);
+		if(character.getCurrentAP() >= 1){
+			attackCharacter(tile,game,character,player);
+		}
+		else{
+			info.innerHTML = "Not enough AP";
+		}
+		
 	});
 
 	drawButton("buttonSpecialAbility","infoDiv","Special Ability");
@@ -537,6 +504,23 @@ function drawCharOptButtons(tile,game,player){
 	title.innerHTML = character.getClassName();
 	info.innerHTML = "HP: " + character.getCurrentHP() + "/" + character.getHP() + "<br>" + "AP: " + character.getCurrentAP() + "/" + character.getAP();
 	//make function to handle character stat display instead of ^ ... have it display all char stats
+	
+	drawButton("buttonEndTurn","buttonDiv","End Turn");
+	buttonEndTurn = document.getElementById("buttonEndTurn");
+	buttonEndTurn.addEventListener("click",function(){
+		info.innerHTML = "Ending turn";
+		removeButton("buttonMove","infoDiv");
+		removeButton("buttonAttack","infoDiv");
+		removeButton("buttonSpecialAbility","infoDiv");
+		removeButton("buttonEndTurn","buttonDiv");
+		
+		setTimeout(function(){
+			endTurn(game,player);
+			title.innerText = game.turnOrder[game.getTurn() - 1].getName() + "'s turn! \nPlease select a character";
+			info.innerHTML = "";
+			
+		},2000);
+	});
 }
 
 function makeGridRadio(size,div,game){
@@ -631,16 +615,50 @@ function gamePlay(tile,game,div){
 		
 		if(turn == 1){
 			if(tile.className != "X" && tile.className != "O"){//is not obstacle or empty tile
-				player = game.turnOrder[turn - 1];
+				player = game.turnOrder[0];
 				var character = player.getCharByToken(tile.className);
-				if(character == player.getCharacter(0) || character == player.getCharacter(1)){
-					drawCharOptButtons(tile,game,player);
+				if(character && character.getOwner() == player.getName()){//character !undefined and player owns character
+					playerTurn(game,player,tile);
 				}
 			}
 		}
-		
+		if(turn == 2){
+			if(tile.className != "X" && tile.className != "O"){//is not obstacle or empty tile
+				player = game.turnOrder[1];
+				var character = player.getCharByToken(tile.className);
+				if(character && character.getOwner() == player.getName()){//character !undefined and player owns character
+					playerTurn(game,player,tile);
+				}
+			}
+		}
 	}//end if round > 1
 	
+}
+
+function playerTurn(game,player,tile){
+	drawCharOptButtons(tile,game,player);
+	removeGrid();//<-- remove grid and all associated event listeners
+	drawGrid(game,"tableDiv");//<-- redraw grid with default event listeners
+}
+
+function endTurn(game,player){
+	var turn = game.getTurn();
+	var round = game.getRound();
+	var numberOfCharacters = player.getCharTotal();
+	
+	if(turn == 1){
+		turn++;
+	}
+	else{
+		turn = 1;
+		round++;
+	}
+	
+	for(var i = 0; i < numberOfCharacters; i++){
+		player.getCharacter(i).setCurrentAP(player.getCharacter(i).getAP());//reset AP to character AP total for each char in list
+	}
+	
+	game.updateGameState(false,round,turn);
 }
 
 function firstRound(tile,game,div,player,turn,round,yAxis,xAxis){
@@ -736,13 +754,14 @@ function moveCharacter(tile,game,character,player){
 		for(var j = 0; j < game.getGridSize(); j++){
 			var id = i.toString() + j.toString();
 			var td = document.getElementById(id);
+			var clickedCharacter = this.className;
 			td.addEventListener("click",function(){
 				if(this.className == "O"){
 					info.innerHTML = "Move to " + this.parentNode.rowIndex + this.cellIndex + "?";
 					destinationTile = this;
 				}
 				//need condition to handle clicking on another owned char
-				if(this.className.slice(1,2) == player.getPlayerNumber()){
+				if(clickedCharacter && player.getCharByToken(clickedCharacter).getOwner() == player.getName()){//<-- does not work with ranger (Ra1 will return a not 1)
 					removeGrid();
 					drawGrid(game,"tableDiv");
 					drawCharOptButtons(tile,game,player);
@@ -759,6 +778,7 @@ function attackCharacter(tile,game,character,player){
 	var info = document.getElementById("info");
 	var title = document.getElementById("title");
 	var defendingCharacter;
+	var currentAP = player.getCharByToken(character.token).getCurrentAP();
 	//var attackingCharacter = player.getCharByToken(character);
 	
 	removeButton("buttonMove","infoDiv");
@@ -780,9 +800,15 @@ function attackCharacter(tile,game,character,player){
 		var yDifference = Math.abs(defendingCharacter.getPosition().slice(0,1) - character.getPosition().slice(0,1));
 		var xDifference = Math.abs(defendingCharacter.getPosition().slice(1,2) - character.getPosition().slice(1,2));
 		
+		
 		if(yDifference <= attackerRange && xDifference <= attackerRange){
 			damageDone = game.combat(character,defendingCharacter);
 			info.innerHTML = "Total damage done to enemy: " + damageDone;
+			character.setCurrentAP(currentAP - 1);
+			removeButton("buttonConfirm","infoDiv");
+			removeButton("buttonCancel","infoDiv");
+			setTimeout(function(){drawCharOptButtons(tile,game,player);},2000);
+			
 		}
 		else{
 			info.innerHTML = "Target is too far!";
@@ -802,8 +828,19 @@ function attackCharacter(tile,game,character,player){
 		for(var j = 0; j < game.getGridSize(); j++){
 			var id = i.toString() + j.toString();
 			var td = document.getElementById(id);
+			
 			td.addEventListener("click",function(){
-				if(this.className != "O" && this.className != "X" && this.className.slice(1,2) != player.getPlayerNumber()){
+				var clickedCharacter;
+				var playerTwo;
+				if(player.getPlayerNumber() == 1){
+					playerTwo = game.getPlayer(1);
+					clickedCharacter = playerTwo.getCharByToken(this.className);
+				}
+				else{
+					playerTwo = game.getPlayer(0);
+					clickedCharacter = playerTwo.getCharByToken(this.className);
+				}
+				if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() != player.getName()){
 					info.innerHTML = "Attack " + this.parentNode.rowIndex + this.cellIndex + "?";
 					defendingCharacter = game.getPlayer(this.className.slice(1,2) - 1).getCharByToken(this.className);
 				}

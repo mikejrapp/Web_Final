@@ -297,47 +297,60 @@ function Game(){
 		//need checks for special abilities and conditional modifiers
 		if(attackingCharacter.getClassName() == "Rogue"){
 			if(attackingCharacter.getPrecisionStrikeState() == true){
-				damge = attackingCharacter.precisionStrike();
-				if(damage > 0 && attackRoll < 25){//if attack roll failed, but crit did not
-					attackRoll = 25;
+				if(attackRoll < 25){//if attack rolled failed
+					attackRoll = 25;//attack success
 				}
-			}
-		}
-		
-		if(defendingCharacter.getClassName() == "Warrior"){
-			if(defendingCharacter.getBlockState() == true){
-				
 			}
 		}
 		
 		if(attackRoll >= 75){
 			//max damage
 			damage = attackValue;
-			defendingCharacter.setCurrentHP(defenseHP - damage);
-			
 		}
 		else if(attackRoll >= 50 && attackRoll < 75){
 			// 3/4 damage + damageRoll
 			damage = Math.round(attackValue * .75) + damageRoll;
-			defendingCharacter.setCurrentHP(defenseHP - damage);
+			
 		}
 		else if(attackRoll >= 25 && attackRoll < 50){
 			// 1/4 damage + damageRoll
 			damage = Math.round(attackValue * .25) + damageRoll;
-			defendingCharacter.setCurrentHP(defenseHP - damage);
+			
 		}
 		else{
 			//no damage
 			damage = 0;
 		}
 		
-		if(defendingCharacter.getCurrentHP() <= 0){//das kind war tot
-			defendingCharacter.setDeath(true);
+		if(attackingCharacter.getClassName() == "Rogue"){
+			if(attackingCharacter.getPrecisionStrikeState() == true){
+				damage = attackingCharacter.precisionStrike(damage);
+			}
+		}
+		
+		if(attackingCharacter.getClassName() == "Ranger"){
+			if(attackingCharacter.getOverdrawState() == true){
+				damage = attackingCharacter.overdraw(damage);
+			}
+		}
+		
+		if(defendingCharacter.getClassName() == "Warrior"){
+			if(defendingCharacter.getBlockState() == true){
+				damgage = defendingCharacter.block(damage);
+				defendingCharacter.setCurrentHP(defenseHP - damage);
+			}
+			else{
+				defendingCharacter.setCurrentHP(defenseHP - damage);
+			}
+		}
+		else{
+			defendingCharacter.setCurrentHP(defenseHP - damage);
 		}
 		
 		return damage;
 		
 	}
+	
 	
 	/**************************************************
 		special ability function needed
@@ -440,6 +453,7 @@ function Character(){
 	this.token;
 	this.isDead;
 	this.isStunned;
+	this.isStunned;
 	this.healthPoints;
 	this.actionPoints;
 	this.attack;
@@ -451,12 +465,14 @@ function Character(){
 	this.specialAbilities = new Array();
 	this.position;
 	this.owner //<-- var to determine who the character belongs to
+	this.tauntingCharacter;//<-- var to determine who is taunting this character
 	
 	this.initChar = function(token,HP,AP,atk,init,mvSpd,atkRng,abl1,abl2,pOwner){
 		//this is more intended to be used after creating an object which inherits this.
 		this.token = token;
 		this.isDead = false;
 		this.isStunned = false;
+		this.isTaunted = false;
 		this.healthPoints = HP;
 		this.currentHP = HP;
 		this.actionPoints = AP;
@@ -476,6 +492,11 @@ function Character(){
 	
 	this.setStun = function(stunState){
 		this.isStunned = stunState;
+	}
+	
+	this.setTaunt = function(tauntState,pTauntingCharacter){
+		this.isTaunted = tauntState;
+		this.tauntingCharacter = pTauntingCharacter;
 	}
 	
 	this.setCurrentHP = function(HP){
@@ -545,6 +566,18 @@ function Character(){
 	this.getOwner = function(){
 		return this.owner;
 	}
+	
+	this.getStunState = function(){
+		return this.isStunned;
+	}
+	
+	this.getTauntState = function(){
+		return this.isTaunted;
+	}
+	
+	this.getTauntingCharacter = function(){
+		return this.tauntingCharacter;
+	}
 }
 	
 function Warrior(){
@@ -560,31 +593,54 @@ function Warrior(){
 		this.isBlocking = bloskState;
 	}
 	
-	/*this.getTauntState(){
+	this.getTauntState = function(){
 		return this.isTaunting;
 	}
 	
-	this.getBlockState(){
+	this.getBlockState = function(){
 		return this.isBlocking;
-	}*/
+	}
 	
 	this.getClassName = function(){
 		return this.className;
 	}
 	
-	/*this.block(){
-		//add block
-	}*/
+	this.block = function(incomingDamage){
+		var blockedDamage;
+		var blockChance = Math.floor((Math.random() * 100) + 1);
+		
+		if(blockChance >= 80){
+			blockedDamage = incomingDamage;//block all incoming damage
+		}
+		if(blockChance < 80 && blockChance >= 50){
+			blockedDamage = incomingDamage * .5;//block half of damage
+		}
+		if(blockChance < 50 && blockChance >= 25){
+			blockedDamage = incomingDamage * .25;//block a quarter of damage
+		}
+		
+		return incomingDamage - blockedDamage;
+	}
+	
+	this.taunt = function(enemyPlayer){
+		//set the player to being taunted. Setup isTaunted for character type which checks if isTaunted is on
+		//if isTaunted is on, only can attack this character until turn counter runs out.
+		var tauntChance = Math.floor((Math.random() * 100) + 1);
+		
+		if(tauntChance >= 25){
+			enemyPlayer.setTaunt(true);
+		}
+	}
 }
 	
 	Warrior.prototype = new Character();
 	
 function Rogue(){
-	this.isPrecisionStrikOn = false;
+	this.isPrecisionStrikeOn = false;
 	this.className = "Rogue";
 	
 	this.setPrecisionStrike = function(precisionStrikeState){
-		this.isPrecisionStrike = precisionStrikeState;
+		this.isPrecisionStrikeOn = precisionStrikeState;
 	}
 	
 	this.getClassName = function(){
@@ -592,19 +648,18 @@ function Rogue(){
 	}
 	
 	this.getPrecisionStrikeState = function(){
-		return this.precisionStrike;
+		return this.isPrecisionStrikeOn;
 	}
 	
-	this.precisionStrike = function(){
-		//should be a garuanteed hit (between 1/4 and 1) + small amount of bonus damage
+	this.precisionStrike = function(damage){
 		var critChance = Math.floor((Math.random() * 100) + 1);
-		var bonusDamage = 20;
+		var bonusDamage = damage + 20;
 		
-		if(critChance > 66){
+		if(critChance > 66){//33% chance to crit...pretty high, but think I will keep since it only does small amount of bonus damage
 			return bonusDamage;
 		}
 		else{
-			return 0;
+			return damage;//base damage
 		}
 	}
 	
@@ -619,10 +674,33 @@ function Rogue(){
 	Rogue.prototype = new Character();
 
 function Ranger(){
+	this.isOverdrawing;
+	this.isExerting;
 	this.className = "Ranger";
 	
 	this.getClassName = function(){
 		return this.className;
+	}
+	
+	this.setOverdraw = function(overdrawState){
+		this.isOverdrawing = overdrawState;
+	}
+	
+	this.setExert = function(exertState){
+		this.isExerting = exertState;
+	}
+	
+	this.getOverdrawState = function(){
+		return this.isOverdrawing;
+	}
+	
+	this.getExertState = function(){
+		return this.isExerting;
+	}
+	
+	this.overdraw = function(baseDamage){
+		//guaranteed overdraw...loses this turn
+		return baseDamage * 1.5;
 	}
 }
 
