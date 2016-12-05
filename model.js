@@ -222,8 +222,12 @@ function Game(){
 		return this.turn;
 	}
 
-	this.getPlayer = function(pos){
-		return this.turnOrder[pos];
+	this.getPlayer = function(playerNumber){
+		for(var i = 0; i < this.turnOrder.length; i++){
+			if(this.turnOrder[i].getPlayerNumber() == playerNumber){
+				return this.turnOrder[i];
+			}
+		}
 	}
 	
 	
