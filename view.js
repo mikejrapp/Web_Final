@@ -475,57 +475,65 @@ function drawCharOptButtons(tile,game,player){
 	
 	removeAllInfoButtons();
 	
-	drawButton("buttonMove","infoDiv","Move");
-	buttonMove = document.getElementById("buttonMove");
-	buttonMove.addEventListener("click",function(){
-		if(character.getCurrentAP() >= 1){
-			moveCharacter(tile,game,tile.className,player);
-		}
-		else{
-			info.innerHTML = "Not enough AP";
-		}
-	});
-
-	drawButton("buttonAttack","infoDiv","Attack");
-	buttonAttack = document.getElementById("buttonAttack");
-	buttonAttack.addEventListener("click",function(){
-		if(character.getCurrentAP() >= 1){
-			attackCharacter(tile,game,character,player);
-		}
-		else{
-			info.innerHTML = "Not enough AP";
-		}
-		
-	});
-
-	drawButton("buttonSpecialAbility","infoDiv","Special Ability");
-	buttonSpecialAbility = document.getElementById("buttonSpecialAbility");
-	buttonSpecialAbility.addEventListener("click",function(){
-		if(character.getCurrentAP() >= 1){
-			specialAbility(tile,game,character,player);
-		}
-		else{
-			info.innerHTML = "Not enough AP";
-		}
-	});
-
-	title.innerHTML = character.getClassName();
-	info.innerHTML = "HP: " + character.getCurrentHP() + "/" + character.getHP() + "<br>" + "AP: " + character.getCurrentAP() + "/" + character.getAP();
-	//make function to handle character stat display instead of ^ ... have it display all char stats
-	
-	drawButton("buttonEndTurn","buttonDiv","End Turn");
-	buttonEndTurn = document.getElementById("buttonEndTurn");
-	buttonEndTurn.addEventListener("click",function(){
-		info.innerHTML = "Ending turn";
-		removeAllInfoButtons();
-		
-		setTimeout(function(){
-			endTurn(game,player);
-			title.innerText = game.turnOrder[game.getTurn() - 1].getName() + "'s turn! \nPlease select a character";
-			info.innerHTML = "";
+	if(character.getStunState() == true){
+			info.innerHTML = "This character is paralyzed and cannot move, attack or use abilities";
+	}
+	else{
+		drawButton("buttonMove","infoDiv","Move");
+		buttonMove = document.getElementById("buttonMove");
+		buttonMove.addEventListener("click",function(){
 			
-		},1500);
+			if(character.getCurrentAP() >= 1){
+				moveCharacter(tile,game,tile.className,player);
+			}
+			else{
+				info.innerHTML = "Not enough AP";
+			}
+		});
+
+		drawButton("buttonAttack","infoDiv","Attack");
+		buttonAttack = document.getElementById("buttonAttack");
+		buttonAttack.addEventListener("click",function(){
+			if(character.getCurrentAP() >= 1){
+				attackCharacter(tile,game,character,player);
+			}
+			else{
+				info.innerHTML = "Not enough AP";
+			}
+			
+		});
+
+		drawButton("buttonSpecialAbility","infoDiv","Special Ability");
+		buttonSpecialAbility = document.getElementById("buttonSpecialAbility");
+		buttonSpecialAbility.addEventListener("click",function(){
+			if(character.getCurrentAP() >= 1){
+				specialAbility(tile,game,character,player);
+			}
+			else{
+				info.innerHTML = "Not enough AP";
+			}
+		});
+
+		title.innerHTML = character.getClassName();
+		info.innerHTML = "HP: " + character.getCurrentHP() + "/" + character.getHP() + "<br>" + "AP: " + character.getCurrentAP() + "/" + character.getAP();
+		//make function to handle character stat display instead of ^ ... have it display all char stats
+		
+		drawButton("buttonEndTurn","buttonDiv","End Turn");
+		buttonEndTurn = document.getElementById("buttonEndTurn");
+		buttonEndTurn.addEventListener("click",function(){
+			info.innerHTML = "Ending turn";
+			removeAllInfoButtons();
+			
+			setTimeout(function(){
+				endTurn(game,player);
+				title.innerText = game.turnOrder[game.getTurn() - 1].getName() + "'s turn! \nPlease select a character";
+				info.innerHTML = "";
+				
+			},1500);
 	});
+	}	
+	
+	
 }
 
 function makeGridRadio(size,div,game){
@@ -883,9 +891,17 @@ function specialAbility(tile,game,character,player){
 		if(character.getClassName() == "Warrior"){
 			var buttonBlock;
 			var buttonTaunt;
+			var blockCost = 2;
 			title.innerHTML = "Warrior Abilities:";
 			drawButton("buttonBlock","infoDiv","Block");
 			drawButton("buttonTaunt","infoDiv","Taunt");
+			buttonBlock = document.getElementById("buttonBlock");
+			buttonBlock.addEventListener("click",function(){
+				if(character.getCurrentAP() >= blockCost){
+					character.setBlockState(true);
+				}
+				removeAllInfoButtons();
+			});
 		}
 		
 		if(character.getClassName() == "Rogue"){
@@ -911,7 +927,14 @@ function specialAbility(tile,game,character,player){
 		}
 		
 		drawButton("buttonCancel","infoDiv","Cancel");
-		
+		buttonCancel = document.getElementById("buttonCancel");
+		buttonCancel.addEventListener("click",function(){
+			removeAllInfoButtons();
+			info.innerHTML = "";
+			removeGrid();//<-- remove grid and all associated event listeners
+			drawGrid(game,"tableDiv");//<-- redraw grid with default event listeners
+			drawCharOptButtons(tile,game,player);
+		});
 	
 }
 

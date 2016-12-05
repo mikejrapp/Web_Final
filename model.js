@@ -329,18 +329,21 @@ function Game(){
 		if(attackingCharacter.getClassName() == "Rogue"){
 			if(attackingCharacter.getPrecisionStrikeState() == true){
 				damage = attackingCharacter.precisionStrike(damage);
+				attackingCharacter.setPrecisionStrike(false);
 			}
 		}
 		
 		if(attackingCharacter.getClassName() == "Ranger"){
 			if(attackingCharacter.getOverdrawState() == true){
 				damage = attackingCharacter.overdraw(damage);
+				attackingCharacter.setOverdraw(false);
 			}
 		}
 		
 		if(defendingCharacter.getClassName() == "Warrior"){
 			if(defendingCharacter.getBlockState() == true){
-				damgage = defendingCharacter.block(damage);
+				damage = defendingCharacter.block(damage);
+				defendingCharacter.setBlockState(false);
 				defendingCharacter.setCurrentHP(defenseHP - damage);
 			}
 			else{
@@ -589,12 +592,12 @@ function Warrior(){
 	this.isTaunting = false;
 	this.isBlocking = false;
 	
-	this.setTaunt = function(tauntState){
+	this.setTauntState = function(tauntState){
 		this.isTaunting = tauntState;
 	}
 	
-	this.setBlock = function(blockState){
-		this.isBlocking = bloskState;
+	this.setBlockState = function(blockState){
+		this.isBlocking = blockState;
 	}
 	
 	this.getTauntState = function(){
