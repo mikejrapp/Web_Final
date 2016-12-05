@@ -595,6 +595,12 @@ function removeAllInfoButtons(){
 	removeButton("buttonEndTurn","buttonDiv");
 	removeButton("buttonBlock","infoDiv");
 	removeButton("buttonTaunt","infoDiv");
+	removeButton("buttonPrecisionStrike","infoDiv");
+	removeButton("buttonLeap","infoDiv");
+	removeButton("buttonOverdraw","infoDiv");
+	removeButton("buttonExert","infoDiv");
+	removeButton("buttonParalyze","infoDiv");
+	removeButton("buttonHeal","infoDiv");
 }
 
 function drawButton(button,div,label){
@@ -892,31 +898,79 @@ function specialAbility(tile,game,character,player){
 			var buttonBlock;
 			var buttonTaunt;
 			var blockCost = 2;
+			var tauntCost = 2;
 			title.innerHTML = "Warrior Abilities:";
 			drawButton("buttonBlock","infoDiv","Block");
 			drawButton("buttonTaunt","infoDiv","Taunt");
+			
 			buttonBlock = document.getElementById("buttonBlock");
 			buttonBlock.addEventListener("click",function(){
 				if(character.getCurrentAP() >= blockCost){
 					character.setBlockState(true);
+					character.setCurrentAP(character.getCurrentAP() - blockCost);
 				}
-				removeAllInfoButtons();
+				else{
+					info.innerHTML = "Not enough AP";
+				}
+				removeAllInfoButtons();//time delay so user can see result
 			});
 		}
 		
 		if(character.getClassName() == "Rogue"){
 			var buttonPrecisionStrike;
 			var buttonLeap;
+			var precisionStrikeCost = 3;
+			var leapCost = 3;
+			
 			title.innerHTML = "Rogue Abilities:";
 			drawButton("buttonPrecisionStrike","infoDiv","Precision Strike");
 			drawButton("buttonLeap","infoDiv","leap");
+			
+			buttonPrecisionStrike = document.getElementById("buttonPrecisionStrike");
+			buttonPrecisionStrike.addEventListener("click",function(){
+				if(character.getCurrentAP() >= precisionStrikeCost){
+					character.setPrecisionStrike(true);
+					character.setCurrentAP(character.getCurrentAP() - precisionStrikeCost);
+				}
+				else{
+					info.innerHTML = "Not enough AP";
+				}
+				removeAllInfoButtons();
+			});
 		}
 		if(character.getClassName() == "Ranger"){
 			var buttonOverdraw;
 			var buttonExert;
+			var overdrawCost = 4;
+			var exertCost = 1;
+			
 			title.innerHTML = "Ranger Abilities:";
 			drawButton("buttonOverdraw","infoDiv","Overdraw");
 			drawButton("buttonExert","infoDiv","Exert");
+			
+			buttonOverdraw = document.getElementById("buttonOverdraw");
+			buttonOverdraw.addEventListener("click",function(){
+				if(character.getCurrentAP() >= overdrawCost){
+					character.setOverdraw(true);
+					character.setCurrentAP(character.getCurrentAP() - overdrawCost);
+				}
+				else{
+					info.innerHTML = "Not enough AP";
+				}
+				removeAllInfoButtons();
+			});
+			
+			buttonExert = document.getElementById("buttonExert");
+			buttonExert.addEventListener("click",function(){
+				if(character.currentAP >= exertCost){
+					character.setExert(true);
+					character.setCurrentAP(character.getCurrentAP() - exertCost);
+				}
+				else{
+					info.innerHTML = "Not enough AP";
+				}
+				removeAllInfoButtons();
+			});
 		}
 		if(character.getClassName() == "Mage"){
 			var buttonParalyze;
