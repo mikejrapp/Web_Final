@@ -307,6 +307,8 @@ function Game(){
 			}
 		}
 		
+		
+		
 		if(attackRoll >= 75){
 			//max damage
 			damage = attackValue;
@@ -461,6 +463,7 @@ function Character(){
 	this.isDead;
 	this.isStunned;
 	this.isStunned;
+	this.isTaunted;
 	this.healthPoints;
 	this.actionPoints;
 	this.attack;
@@ -491,6 +494,7 @@ function Character(){
 		this.specialAbilities.push(abl1);
 		this.specialAbilities.push(abl2);
 		this.owner = pOwner;
+		this.tauntingCharacter = "";
 	}
 	
 	this.setDeath = function(deathState){
@@ -578,8 +582,12 @@ function Character(){
 		return this.isStunned;
 	}
 	
-	this.getTauntState = function(){
+	this.isTauntedByEnemy = function(){
 		return this.isTaunted;
+	}
+	
+	this.isTauntingEnemy = function(){
+		return this.isTaunting;
 	}
 	
 	this.getTauntingCharacter = function(){
@@ -613,7 +621,7 @@ function Warrior(){
 	}
 	
 	this.block = function(incomingDamage){
-		var blockedDamage;
+		var blockedDamage = 0;
 		var blockChance = Math.floor((Math.random() * 100) + 1);
 		
 		if(blockChance >= 80){
@@ -718,6 +726,17 @@ function Mage(){
 	
 	this.getClassName = function(){
 		return this.className;
+	}
+	
+	this.paralyze = function(){
+		var paralyzeChance = Math.floor((Math.random() * 100) + 1);
+		
+		if(paralyzeChance >= 25){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 

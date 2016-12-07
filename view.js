@@ -477,6 +477,7 @@ function drawCharOptButtons(tile,game,player){
 	
 	if(character.getStunState() == true){
 			info.innerHTML = "This character is paralyzed and cannot move, attack or use abilities";
+			
 	}
 	else{
 		drawButton("buttonMove","infoDiv","Move");
@@ -518,21 +519,21 @@ function drawCharOptButtons(tile,game,player){
 		info.innerHTML = "HP: " + character.getCurrentHP() + "/" + character.getHP() + "<br>" + "AP: " + character.getCurrentAP() + "/" + character.getAP();
 		//make function to handle character stat display instead of ^ ... have it display all char stats
 		
-		drawButton("buttonEndTurn","buttonDiv","End Turn");
-		buttonEndTurn = document.getElementById("buttonEndTurn");
-		buttonEndTurn.addEventListener("click",function(){
-			info.innerHTML = "Ending turn";
-			removeAllInfoButtons();
-			
-			setTimeout(function(){
-				endTurn(game,player);
-				title.innerText = game.turnOrder[game.getTurn() - 1].getName() + "'s turn! \nPlease select a character";
-				info.innerHTML = "";
-				
-			},1500);
-	});
+		
 	}	
-	
+	drawButton("buttonEndTurn","buttonDiv","End Turn");
+	buttonEndTurn = document.getElementById("buttonEndTurn");
+	buttonEndTurn.addEventListener("click",function(){
+		info.innerHTML = "Ending turn";
+		removeAllInfoButtons();
+		character.setStun(false);
+		setTimeout(function(){
+			endTurn(game,player);
+			title.innerText = game.turnOrder[game.getTurn() - 1].getName() + "'s turn! \nPlease select a character";
+			info.innerHTML = "";
+			
+		},1500);
+	});
 	
 }
 
@@ -628,13 +629,13 @@ function gamePlay(tile,game,div){
 	if(round == 1){
 		
 		if(turn == 1){
-			if(tile.className != "X"){
+			if(tile.className == "O"){
 				player = game.turnOrder[turn - 1];
 				drawInfoButtons(yAxis,xAxis,tile,game,player,turn,round,div);
 			}//end if ! obstacle
 		}
 		if(turn == 2){
-			if(tile.className != "X"){
+			if(tile.className == "O"){
 				player = game.turnOrder[turn - 1];
 				drawInfoButtons(yAxis,xAxis,tile,game,player,turn,round,div);
 			}
@@ -830,19 +831,27 @@ function attackCharacter(tile,game,character,player){
 		var yDifference = Math.abs(defendingCharacter.getPosition().slice(0,1) - character.getPosition().slice(0,1));
 		var xDifference = Math.abs(defendingCharacter.getPosition().slice(1,2) - character.getPosition().slice(1,2));
 		
-		
-		if(yDifference <= attackerRange && xDifference <= attackerRange){
-			damageDone = game.combat(character,defendingCharacter);
-			info.innerHTML = "Total damage done to enemy: " + damageDone;
-			character.setCurrentAP(currentAP - 1);
-			removeButton("buttonConfirm","infoDiv");
-			removeButton("buttonCancel","infoDiv");
-			setTimeout(function(){drawCharOptButtons(tile,game,player);},2000);
-			
+		if(character.isTauntedByEnemy() && character.getTauntingCharacter() != defendingCharacter){
+			info.innerHTML = "This character is being taunted by enemy " + character.getTauntingCharacter().getClassName() + " and must attack that character."
 		}
 		else{
-			info.innerHTML = "Target is too far!";
+			if(yDifference <= attackerRange && xDifference <= attackerRange){
+				damageDone = game.combat(character,defendingCharacter);
+				info.innerHTML = "Total damage done to enemy: " + damageDone;
+				character.setCurrentAP(currentAP - 1);
+				removeButton("buttonConfirm","infoDiv");
+				removeButton("buttonCancel","infoDiv");
+				setTimeout(function(){drawCharOptButtons(tile,game,player)},2000);
+				character.setTaunt(false,"");
+				if(character.getClassName() == "Warrior"){
+					character.setTauntState(false);
+				}
+			}
+			else{
+				info.innerHTML = "Target is too far!";
+			}
 		}
+		
 		
 		
 	});
@@ -912,7 +921,44 @@ function specialAbility(tile,game,character,player){
 				else{
 					info.innerHTML = "Not enough AP";
 				}
-				removeAllInfoButtons();//time delay so user can see result
+				setTimeout(removeAllInfoButtons(),1500);//should set time delay so user can see result
+			});
+			
+			buttonTaunt = document.getElementById("buttonTaunt");
+			buttonTaunt.addEventListener("click",function(){
+				if(character.getCurrentAP() >= tauntCost){
+					info.innerHTML = "Select enemy to taunt";
+					removeAllInfoButtons();
+					for(var i = 0; i < game.getGridSize(); i++){
+						for(var j = 0; j < game.getGridSize(); j++){
+							var id = i.toString() + j.toString();
+							var td = document.getElementById(id);
+							
+							td.addEventListener("click",function(){
+								var clickedCharacter;
+								var playerTwo;
+								if(player.getPlayerNumber() == 1){
+									playerTwo = game.getPlayer(2);
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+								}
+								else{
+									playerTwo = game.getPlayer(1);
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+								}
+								if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() != player.getName()){
+									info.innerHTML = "Taunt " + this.parentNode.rowIndex + this.cellIndex + "?";
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+									specialAbilityTaunt(this,game,player,character);
+								}
+								if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
+									removeGrid();
+									drawGrid(game,"tableDiv");
+									drawCharOptButtons(tile,game,player);
+								}
+							});
+						}
+					}	
+				}	
 			});
 		}
 		
@@ -935,7 +981,7 @@ function specialAbility(tile,game,character,player){
 				else{
 					info.innerHTML = "Not enough AP";
 				}
-				removeAllInfoButtons();
+				setTimeout(removeAllInfoButtons(),1500);
 			});
 		}
 		if(character.getClassName() == "Ranger"){
@@ -969,15 +1015,54 @@ function specialAbility(tile,game,character,player){
 				else{
 					info.innerHTML = "Not enough AP";
 				}
-				removeAllInfoButtons();
+				setTimeout(removeAllInfoButtons(),1500);
 			});
 		}
 		if(character.getClassName() == "Mage"){
 			var buttonParalyze;
 			var buttonHeal;
+			var paralyzeCost = 2;
+			var healCost = 2;
 			title.innerHTML = "Mage Abilities:";
-			drawButton("buttonParalyzez","infoDiv","Paralyze");
+			drawButton("buttonParalyze","infoDiv","Paralyze");
 			drawButton("buttonHeal","infoDiv","Heal");
+			
+			buttonParalyze = document.getElementById("buttonParalyze");
+			buttonParalyze.addEventListener("click",function(){
+				if(character.getCurrentAP() >= paralyzeCost){
+					info.innerHTML = "Select enemy to paralyze";
+					removeAllInfoButtons();
+					for(var i = 0; i < game.getGridSize(); i++){
+						for(var j = 0; j < game.getGridSize(); j++){
+							var id = i.toString() + j.toString();
+							var td = document.getElementById(id);
+							
+							td.addEventListener("click",function(){
+								var clickedCharacter;
+								var playerTwo;
+								if(player.getPlayerNumber() == 1){
+									playerTwo = game.getPlayer(2);
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+								}
+								else{
+									playerTwo = game.getPlayer(1);
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+								}
+								if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() != player.getName()){
+									info.innerHTML = "Paralyze " + this.parentNode.rowIndex + this.cellIndex + "?";
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+									specialAbilityParalyze(this,game,player,character);
+								}
+								if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
+									removeGrid();
+									drawGrid(game,"tableDiv");
+									drawCharOptButtons(tile,game,player);
+								}
+							});
+						}
+					}	
+				}
+			});
 		}
 		
 		drawButton("buttonCancel","infoDiv","Cancel");
@@ -990,6 +1075,99 @@ function specialAbility(tile,game,character,player){
 			drawCharOptButtons(tile,game,player);
 		});
 	
+}
+
+function specialAbilityTaunt(tile,game,player,character){
+	var enemyPlayer;
+	var tauntTarget;// = enemyPlayer.getCharByToken(tile);
+	var info = document.getElementById("info");
+	var buttonConfirm;
+	var buttonCancel;
+	
+	if(player.getPlayerNumber() == 1){
+		enemyPlayer = game.getPlayer(2);
+	}
+	else{
+		enemyPlayer = game.getPlayer(1);
+	}
+	
+	tauntTarget = enemyPlayer.getCharByToken(tile.className);
+	
+	if(tauntTarget.getOwner() != player){
+		
+		info.innerHTML = "Taunt?";
+		drawButton("buttonConfirm","infoDiv","Confirm");
+		drawButton("buttonCancel","infoDiv","Cancel");
+		
+		buttonConfirm = document.getElementById("buttonConfirm");
+		buttonCancel = document.getElementById("buttonCancel");
+		
+		buttonConfirm.addEventListener("click",function(){
+			character.setTauntState(true);
+			character.setCurrentAP(character.getCurrentAP() - 2);
+			tauntTarget.setTaunt(true,character);
+			info.innerHTML = character.getClassName() + " is taunting enemy " + tauntTarget.getClassName();
+			setTimeout(function(){removeAllInfoButtons()},1500);
+		});
+		
+		buttonCancel.addEventListener("click",function(){
+			removeAllInfoButtons();
+		});
+	}
+	else{
+		info.innerHTML = "Cannot taunt your own characters";
+	}
+}
+
+function specialAbilityParalyze(tile,game,player,character){
+	var enemyPlayer;
+	var paralyzeTarget;
+	var info = document.getElementById("info");
+	var buttonConfirm;
+	var buttonCancel;
+	
+	if(player.getPlayerNumber() == 1){
+		enemyPlayer = game.getPlayer(2);
+	}
+	else{
+		enemyPlayer = game.getPlayer(1);
+	}
+	
+	paralyzeTarget = enemyPlayer.getCharByToken(tile.className);
+	
+	if(paralyzeTarget.getOwner() != player){
+		
+		info.innerHTML = "Paralyze?";
+		drawButton("buttonConfirm","infoDiv","Confirm");
+		drawButton("buttonCancel","infoDiv","Cancel");
+		
+		buttonConfirm = document.getElementById("buttonConfirm");
+		buttonCancel = document.getElementById("buttonCancel");
+		
+		buttonConfirm.addEventListener("click",function(){
+			if(character.paralyze()){
+				paralyzeTarget.setStun(true);
+				info.innerHTML = paralyzeTarget.getClassName() + " is stunned";
+				
+			}
+			else{
+				info.innerHTML = "Paralyze failed";
+			}
+			setTimeout(function(){removeAllInfoButtons()},1500);
+		});
+		
+		buttonCancel.addEventListener("click",function(){
+			removeAllInfoButtons();
+		});
+	}
+	else{
+		info.innerHTML = "Cannot stun your own characters";
+	}
+}
+
+function clearStatusAilments(character){
+	character.setStun(false);
+	character.setTaunt(false,"");
 }
 
 function resetGame(game,div){
