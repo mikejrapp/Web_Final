@@ -301,7 +301,7 @@ function Game(){
 		//add combat handler
 		var attackValue = attackingCharacter.getAttack();
 		var defenseHP = defendingCharacter.getCurrentHP();
-		var attackRoll = Math.floor((Math.random() * 100) + 1);
+		var attackRoll = 100//Math.floor((Math.random() * 100) + 1);
 		var damageRoll = Math.floor((Math.random() * 5) + 1);
 		var damage;
 		
@@ -318,7 +318,7 @@ function Game(){
 		
 		if(attackRoll >= 75){
 			//max damage
-			damage = attackValue;
+			damage = 1000//attackValue;
 		}
 		else if(attackRoll >= 50 && attackRoll < 75){
 			// 3/4 damage + damageRoll
@@ -361,6 +361,10 @@ function Game(){
 		}
 		else{
 			defendingCharacter.setCurrentHP(defenseHP - damage);
+		}
+		
+		if(defendingCharacter.getCurrentHP() <= 0){
+			defendingCharacter.setDeath(true);
 		}
 		
 		return damage;
