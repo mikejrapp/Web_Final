@@ -369,11 +369,60 @@ function drawGrid(game,div){
 		table.appendChild(tr);
 		for(var j = 0; j < game.getGridSize(); j++){
 			var td = document.createElement("td");
+			var image = document.createElement("img");
+			
 			td.id = i.toString() + j.toString();
+			image.id = td.id;
 			td.className = game.getGridIndex(i,j);
+			image.className = td.className;
 			td.addEventListener("click",function(){
 				gamePlay(this,game,div);
 			});
+			
+			if(image.className == "O"){
+				image.src = "Images/Tiles/open.jpg";
+			}
+			if(image.className == "X"){
+				image.src = "Images/Tiles/Obstacle2.jpg";
+			}
+			if(image.className == "X1"){
+				image.src = "Images/Tiles/Obstacle1.jpg";
+			}
+			if(image.className == "X2"){
+				image.src = "Images/Tiles/Obstacle1_1.jpg";
+			}
+			if(image.className == "X3"){
+				image.src = "Images/Tiles/Obstacle2_1.jpg";
+			}
+			if(image.className.slice(0,1) != "O" && image.className.slice(0,1) != "X"){
+				switch(image.className){
+					case "W1":
+						image.src = "Images/Tiles/p1Warrior.jpg";
+						break;
+					case "R1":
+						image.src = "Images/Tiles/p1Rogue.jpg";
+						break;
+					case "Ra1":
+						image.src = "Images/Tiles/p1Ranger.jpg";
+						break;
+					case "M1":
+						image.src = "Images/Tiles/p1Mage.jpg";
+						break;
+					case "W2":
+						image.src = "Images/Tiles/p2Warrior.jpg";
+						break;
+					case "R2":
+						image.src = "Images/Tiles/p2Rogue.jpg";
+						break;
+					case "Ra2":
+						image.src = "Images/Tiles/p2Ranger.jpg";
+						break;
+					case "M2":
+						image.src = "Images/Tiles/p2Mage.jpg";
+						break;
+				}
+			}
+			td.appendChild(image);
 			tr.appendChild(td);
 		}
 	}
@@ -651,6 +700,7 @@ function gamePlay(tile,game,div){
 				if(character && character.getOwner() == player.getName()){//character !undefined and player owns character
 					playerTurn(game,player,tile);
 				}
+				checkDeathState(tile,game,player,character);
 			}
 		}
 		if(turn == 2){
@@ -660,9 +710,30 @@ function gamePlay(tile,game,div){
 				if(character && character.getOwner() == player.getName()){//character !undefined and player owns character
 					playerTurn(game,player,tile);
 				}
+				checkDeathState(tile,game,player,character);
 			}
 		}
 	}//end if round > 1
+	
+	
+	
+}
+
+function checkDeathState(tile,game,player,character){
+	var info = document.getElementById("info");
+	
+	if(character.getDeathState() == true){
+		game.removeCharacter(tile.id);
+		removeGrid();
+		drawGrid(game,"tableDiv");
+		info.innerHTML = character.getClassName() + " has died";
+		if(player.hasLivingCharacters() != true){
+			setTimeout(function(){
+				info.innerHTML = player.getName() + " loses the game!";
+				setTimeout(endGame(),2000);
+			},1500);
+		}
+	}
 	
 }
 
@@ -1063,6 +1134,34 @@ function specialAbility(tile,game,character,player){
 					}	
 				}
 			});
+			
+			buttonHeal = document.getElementById("buttonHeal");
+			buttonHeal.addEventListener("click",function(){
+				if(character.getCurrentAP() >= healCost){
+					info.innerHTML = "Select friend to heal";
+					removeAllInfoButtons();
+					for(var i = 0; i < game.getGridSize(); i++){
+						for(var j = 0; j < game.getGridSize(); j++){
+							var id = i.toString() + j.toString();
+							var td = document.getElementById(id);
+							
+							td.addEventListener("click",function(){
+								var clickedCharacter = this.className;
+								if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() == player.getName()){
+									info.innerHTML = "Heal " + this.parentNode.rowIndex + this.cellIndex + "?";
+									clickedCharacter = playerTwo.getCharByToken(this.className);
+									specialAbilityParalyze(this,game,player,character);
+								}
+								if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
+									removeGrid();
+									drawGrid(game,"tableDiv");
+									drawCharOptButtons(tile,game,player);
+								}
+							});
+						}
+					}	
+				}
+			});
 		}
 		
 		drawButton("buttonCancel","infoDiv","Cancel");
@@ -1125,6 +1224,8 @@ function specialAbilityParalyze(tile,game,player,character){
 	var info = document.getElementById("info");
 	var buttonConfirm;
 	var buttonCancel;
+	var paralyzeCost = 2;
+	
 	
 	if(player.getPlayerNumber() == 1){
 		enemyPlayer = game.getPlayer(2);
@@ -1148,7 +1249,7 @@ function specialAbilityParalyze(tile,game,player,character){
 			if(character.paralyze()){
 				paralyzeTarget.setStun(true);
 				info.innerHTML = paralyzeTarget.getClassName() + " is stunned";
-				
+				character.setCurrentAP(character.getCurrentAP() - paralyzeCost);
 			}
 			else{
 				info.innerHTML = "Paralyze failed";
@@ -1165,6 +1266,38 @@ function specialAbilityParalyze(tile,game,player,character){
 	}
 }
 
+function specialAbilityHeal(tile,game,player,character){
+	var healTarget;
+	var info = document.getElementById("info");
+	var buttonConfirm;
+	var buttonCancel;
+	var healCost = 2;
+	
+	drawButton("buttonConfirm","infoDiv","Confirm");
+	drawButton("buttonCancel","infoDiv","Cancel");
+	
+	buttonConfirm = document.getElementById("buttonConfirm");
+	buttonCancel = document.getElementById("buttonCancel");
+	
+	buttonConfirm.addEventListener("click",function(){
+		if(player.getCharByToken(tile.className)){
+			var healedAmount;
+			healTarget = player.getCharByToken(tile.className);
+			
+			healedAmount = character.heal(healTarget);
+			healTarget.setCurrentHP(healedAmount + healTarget.getCurrentHP);
+			
+			character.setCurrentAP(character.getCurrentAP() - healCost);
+			
+			info.innerHTML = "The character was healed: " + healedAmount;
+		}
+	});
+	
+	buttonCancel.addEventListener("click",function(){
+		removeAllInfoButtons();
+	});
+}
+
 function clearStatusAilments(character){
 	character.setStun(false);
 	character.setTaunt(false,"");
@@ -1178,6 +1311,17 @@ function resetGame(game,div){
 	if(document.getElementById("table")){
 		tableDiv.removeChild(document.getElementById("table"));
 	}
+}
+
+function endGame(){
+	var info = document.getElementById("info");
+	var title = document.getElementById("title");
+	
+	removeGrid();
+	removeAllInfoButtons();
+	title.innerHTML = "Thank you for playing!";
+	info.innerHTML = "I hope you enjoyed the game!";
+	
 }
 
 //Event functions

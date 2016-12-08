@@ -68,19 +68,19 @@ function Game(){
 		if(size == 5){
 			switch(combinedIndex){
 				case "11":
-					return "X";
+					return "X1";
 					break;
 				case "12":
 					return "X";
 					break;
 				case "21":
-					return "X";
+					return "X2";
 					break;
 				case "24":
 					return "X";
 					break;
 				case "34":
-					return "X";
+					return "X3";
 					break;
 				default:
 					return "O";
@@ -90,31 +90,31 @@ function Game(){
 		if(size == 8){
 			switch(combinedIndex){
 				case "12":
-					return "X";
+					return "X1";
 					break;
 				case "13":
 					return "X";
 					break;
 				case "22":
-					return "X";
+					return "X3";
 					break;
 				case "34":
 					return "X";
 					break;
 				case "35":
-					return "X";
+					return "X1";
 					break;
 				case "36":
-					return "X";
+					return "X2";
 					break;
 				case "43":
 					return "X";
 					break;
 				case "44":
-					return "X";
+					return "X3";
 					break;
 				case "61":
-					return "X";
+					return "X2";
 					break;
 				case "62":
 					return "X";
@@ -127,46 +127,46 @@ function Game(){
 		if(size == 10){
 			switch(combinedIndex){
 				case "17":
-					return "X";
+					return "X1";
 					break;
 				case "18":
 					return "X";
 					break;
 				case "22":
-					return "X";
+					return "X3";
 					break;
 				case "26":
-					return "X";
+					return "X2";
 					break;
 				case "27":
 					return "X";
 					break;
 				case "32":
-					return "X";
+					return "X2";
 					break;
 				case "33":
 					return "X";
 					break;
 				case "37":
-					return "X";
+					return "X1";
 					break;
 				case "41":
 					return "X";
 					break;
 				case "42":
-					return "X";
+					return "X2";
 					break;
 				case "58":
-					return "X";
+					return "X1";
 					break;
 				case "59":
 					return "X";
 					break;
 				case "64":
-					return "X";
+					return "X3";
 					break;
 				case "65":
-					return "X";
+					return "X2";
 					break;
 				case "73":
 					return "X";
@@ -175,7 +175,7 @@ function Game(){
 					return "X";
 					break;
 				case "82":
-					return "X";
+					return "X1";
 					break;
 				default:
 					return "O";
@@ -269,6 +269,13 @@ function Game(){
 			alert("that is not a legal move");
 		}
 		
+	}
+	
+	this.removeCharacter = function(pos){
+		var i = pos.slice(0,1);
+		var j = pos.slice(1,2);
+		
+		this.grid[i][j] = "O";
 	}
 	
 	this.updateGameState = function(pGameOver,pRound,pTurn,pInitiative){
@@ -427,6 +434,23 @@ function Player(pName,pNumber,pType){
 		return this.characters[pos];
 	}
 	
+	this.hasLivingCharacters = function(){
+		var totalLivingCharacters = 0;
+		
+		for(var i = 0; i < this.characters.length; i++){
+			if(this.characters[i].isDead != true){
+				totalLivingCharacters++;
+			}
+		}
+		
+		if(totalLivingCharacters > 0){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
 	this.getCharByToken = function(pToken){
 		for(var i = 0; i < this.characters.length; i++){
 			if(this.characters[i].token == pToken){
@@ -580,6 +604,10 @@ function Character(){
 	
 	this.getStunState = function(){
 		return this.isStunned;
+	}
+	
+	this.getDeathState = function(){
+		return this.isDead;
 	}
 	
 	this.isTauntedByEnemy = function(){
@@ -737,6 +765,21 @@ function Mage(){
 		else{
 			return false;
 		}
+	}
+	
+	this.heal = function(healTarget){
+		var targetCurrentHP = healTarget.getCurrentHP();
+		var healTotal;
+		var healChance = Math.floor((Math.random() * 100) + 1);
+		
+		if(healChance >= 66){
+			healTotal = targetCurrentHP;
+		}
+		else{
+			healTotal = targetCurrentHP / 2;
+		}
+		
+		return healTotal;
 	}
 }
 
