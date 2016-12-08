@@ -82,9 +82,11 @@ function nameSubmit(game,div,title,info,button,field){
 	div.removeChild(field);
 	
 	radioConfirm.type = "radio";
+	radioConfirm.id = "radioConfirm";
 	radioDeny.type = "radio";
 	radioConfirm.name = "radio";
 	radioDeny.name = "radio";
+	radioDeny.id = "radioDeny";
 	
 	labelConfirm.innerHTML = "That's right!";
 	labelDeny.innerHTML = "Erh...no..not quite";
@@ -103,7 +105,7 @@ function nameSubmit(game,div,title,info,button,field){
 			div.removeChild(labelDeny);
 			div.removeChild(buttonSubmit);
 			player = new Player(field.value,1,"PC");
-			console.log(player.getName());
+			//console.log(player.getName());
 			characterSelect(game,player,div,title,info,button,field);
 		}
 		else{
@@ -476,10 +478,12 @@ function drawButtons(div,game){
 function drawInfoButtons(yAxis,xAxis,tile,game,player,turn,round,div){
 	var buttonConfirm = document.createElement("button");
 	var buttonCancel = document.createElement("button");
+	var info = document.getElementById("info");
 	buttonConfirm.id = "buttonConfirm";
 	buttonCancel.id = "buttonCancel";
 	buttonConfirm.innerHTML = "confirm";
 	buttonCancel.innerHTML = "cancel";
+	
 	buttonConfirm.addEventListener("click",function(){
 		if(round == 1){
 			firstRound(tile,game,div,player,turn,round,yAxis,xAxis);
@@ -500,8 +504,9 @@ function drawInfoButtons(yAxis,xAxis,tile,game,player,turn,round,div){
 		if(document.getElementById("buttonCancel")){
 			document.getElementById("infoDiv").removeChild(buttonCancel);
 		}
+		info.innerHTML = "";
 	});
-	info.innerHTML = "would you like to place your character at " + yAxis + " " + xAxis + "?";
+	info.innerHTML = "would you like to place your " + player.getCharacter(player.getInitiative() - 1).getClassName() + " at " + yAxis + " " + xAxis + "?";
 	document.getElementById("infoDiv").appendChild(buttonConfirm);
 	document.getElementById("infoDiv").appendChild(buttonCancel);
 }
@@ -653,6 +658,25 @@ function removeAllInfoButtons(){
 	removeButton("buttonHeal","infoDiv");
 }
 
+function removeForReset(){
+	var infoDiv = document.getElementById("infoDiv");
+	var title = document.getElementById("title");
+	var info = document.getElementById("info");
+	
+	while(infoDiv.hasChildNodes()){
+		if(infoDiv.lastChild.id != "title" && infoDiv.lastChild.id != "info"){
+			infoDiv.removeChild(infoDiv.lastChild);
+		}
+		else{
+			break;
+		}
+	}
+	
+	removeAllInfoButtons();
+	title.innerHTML = "";
+	info.innerHTML = "";
+}
+
 function drawButton(button,div,label){
 	var newButton = document.createElement("button");
 	var parentDiv = document.getElementById(div);
@@ -672,7 +696,7 @@ function gamePlay(tile,game,div){
 	var xAxis = tile.cellIndex//parseInt(tile.id.slice(1,2));
 	var turn = game.getTurn();
 	var round = game.getRound();
-	var player = game.getPlayer(turn);//minus one
+	var player = game.getPlayer(turn);
 	var initiative;
 	
 	if(round == 1){
@@ -722,7 +746,7 @@ function gamePlay(tile,game,div){
 function checkDeathState(tile,game,player,character){
 	var info = document.getElementById("info");
 	
-	if(character.getDeathState() == true){
+	if(character && character.getDeathState() == true){
 		game.removeCharacter(tile.id);
 		removeGrid();
 		drawGrid(game,"tableDiv");
@@ -764,10 +788,12 @@ function endTurn(game,player){
 }
 
 function firstRound(tile,game,div,player,turn,round,yAxis,xAxis){
+	var title = document.getElementById("title");
+	var info = document.getElementById("info");
 	
 	initiative = player.getInitiative();
-	console.log(initiative);
-	title.innerText = game.turnOrder[turn - 1].getName() + "'s turn! \nPlease place a character";
+	//console.log(initiative);
+	title.innerText = game.turnOrder[turn - 1].getName() + "'s turn! \nPlease place your characters";
 	game.placeToken(player.getCharacter(initiative - 1), yAxis, xAxis);
 	game.turnOrder[turn - 1].updateInitiative();
 	removeGrid();
@@ -1133,6 +1159,11 @@ function specialAbility(tile,game,character,player){
 						}
 					}	
 				}
+				else{
+					info.innerHTML = "Not enough AP";
+					removeAllInfoButtons();
+					drawCharOptButtons(tile,game,player);
+				}
 			});
 			
 			buttonHeal = document.getElementById("buttonHeal");
@@ -1249,11 +1280,11 @@ function specialAbilityParalyze(tile,game,player,character){
 			if(character.paralyze()){
 				paralyzeTarget.setStun(true);
 				info.innerHTML = paralyzeTarget.getClassName() + " is stunned";
-				character.setCurrentAP(character.getCurrentAP() - paralyzeCost);
 			}
 			else{
 				info.innerHTML = "Paralyze failed";
 			}
+			character.setCurrentAP(character.getCurrentAP() - paralyzeCost);
 			setTimeout(function(){removeAllInfoButtons()},1500);
 		});
 		
@@ -1306,11 +1337,14 @@ function clearStatusAilments(character){
 function resetGame(game,div){
 	game.reset();
 	//game = new Game();
-	tableDiv = document.getElementById(div);
+	var tableDiv = document.getElementById(div);
+	var infoDiv = document.getElementById("infoDiv");
 	
 	if(document.getElementById("table")){
 		tableDiv.removeChild(document.getElementById("table"));
 	}
+	
+	removeForReset();
 }
 
 function endGame(){

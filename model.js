@@ -204,7 +204,7 @@ function Game(){
 	
 	this.setTurnOrder = function(player1,player2){
 	//This function simulates a coin toss and determines which player goes first
-		var coinToss = Math.floor((Math.random() * 2 )+ 1);
+		/* var coinToss = Math.floor((Math.random() * 2 )+ 1);
 		
 		if(coinToss == 1){
 			console.log(player1.getName() + " will go first");
@@ -215,7 +215,9 @@ function Game(){
 			console.log(player2.getName() + " will go first");
 			this.turnOrder.push(player2);
 			this.turnOrder.push(player1);
-		}
+		} */
+		this.turnOrder[0] = player1;
+		this.turnOrder[1] = player2;
 	}
 	
 	this.getTurn = function(){
@@ -301,7 +303,7 @@ function Game(){
 		//add combat handler
 		var attackValue = attackingCharacter.getAttack();
 		var defenseHP = defendingCharacter.getCurrentHP();
-		var attackRoll = 100//Math.floor((Math.random() * 100) + 1);
+		var attackRoll = Math.floor((Math.random() * 100) + 1);
 		var damageRoll = Math.floor((Math.random() * 5) + 1);
 		var damage;
 		
@@ -318,7 +320,7 @@ function Game(){
 		
 		if(attackRoll >= 75){
 			//max damage
-			damage = 1000//attackValue;
+			damage = attackValue;
 		}
 		else if(attackRoll >= 50 && attackRoll < 75){
 			// 3/4 damage + damageRoll

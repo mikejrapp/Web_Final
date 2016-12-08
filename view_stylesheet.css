@@ -81,9 +81,10 @@ input[type=button]{
 	display: inline-block;
 	position: absolute;
 	position: absolute;
-	width: 400px;
+	width: 300px;
 	height: 600px;
-	margin-left: 875px;
+	margin-left: 900px;
+	padding-left: 10px;
 	/* border-style: solid;
 	border-color: black; */
 }
