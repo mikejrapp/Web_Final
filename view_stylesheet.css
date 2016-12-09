@@ -52,6 +52,7 @@ input[type=button]{
 }
 
 .buttonDiv {
+	z-index: 100;
 	display: inline-block;
 	position: absolute;
 	width: 120px;
@@ -63,22 +64,33 @@ input[type=button]{
 }
 
 audio{
+	//position: absolute;
 	margin-top: 125px;
 	width: 10px;
 }
 
-cite{
+.audioDiv{
+	z-index: 0;
+	position:absolute;
+	margin-top: 10px;
+	float: left;
+}
+
+.audioCite{
+	//position: absolute;
+	margin-top: 5px;
 	font-size: 50%;
 }
 
-a{
+.audioLink{
+	margin-top: 0px;
 	font-size: 50%;
 	color: #9CA485;
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-p{
-	margin-top: 5px;
+.audioLinkText{
+	margin-top: 0px;
 	margin-bottom: -5px;
 }
 
@@ -99,7 +111,6 @@ p{
 
 .infoDiv{
 	display: inline-block;
-	position: absolute;
 	position: absolute;
 	width: 300px;
 	height: 600px;

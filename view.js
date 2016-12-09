@@ -1126,6 +1126,8 @@ function specialAbility(tile,game,character,player){
 			
 			buttonParalyze = document.getElementById("buttonParalyze");
 			buttonParalyze.addEventListener("click",function(){
+				var attackerRange = character.getAtkRng();
+				
 				if(character.getCurrentAP() >= paralyzeCost){
 					info.innerHTML = "Select enemy to paralyze";
 					removeAllInfoButtons();
@@ -1133,7 +1135,9 @@ function specialAbility(tile,game,character,player){
 						for(var j = 0; j < game.getGridSize(); j++){
 							var id = i.toString() + j.toString();
 							var td = document.getElementById(id);
-							
+							var yDifference;// = Math.abs(clickedCharacter.getPosition().slice(0,1) - character.getPosition().slice(0,1));
+							var xDifference;//= Math.abs(clickedCharacter.getPosition().slice(1,2) - character.getPosition().slice(1,2));
+							var castDistance;// = yDifference + xDifferenc;
 							td.addEventListener("click",function(){
 								var clickedCharacter;
 								var playerTwo;
@@ -1145,10 +1149,22 @@ function specialAbility(tile,game,character,player){
 									playerTwo = game.getPlayer(1);
 									clickedCharacter = playerTwo.getCharByToken(this.className);
 								}
-								if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() != player.getName()){
+								yDifference = Math.abs(clickedCharacter.getPosition().slice(0,1) - character.getPosition().slice(0,1));
+								xDifference = Math.abs(clickedCharacter.getPosition().slice(1,2) - character.getPosition().slice(1,2));
+								castDistance = yDifference + xDifference;
+								if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() != player.getName() && castDistance <= attackerRange){
 									info.innerHTML = "Paralyze " + this.parentNode.rowIndex + this.cellIndex + "?";
 									clickedCharacter = playerTwo.getCharByToken(this.className);
 									specialAbilityParalyze(this,game,player,character);
+								}
+								else{
+									info.innerHTML = "Character is out of range!";
+									setTimeout(function(){
+										removeGrid();
+										drawGrid(game,"tableDiv");
+										drawCharOptButtons(tile,game,player);}
+									,1500);
+									
 								}
 								if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
 									removeGrid();
@@ -1177,17 +1193,17 @@ function specialAbility(tile,game,character,player){
 							var td = document.getElementById(id);
 							
 							td.addEventListener("click",function(){
-								var clickedCharacter = this.className;
+								var clickedCharacter = player.getCharByToken(this.className);
 								if(this.className != "O" && this.className != "X" && clickedCharacter && clickedCharacter.getOwner() == player.getName()){
 									info.innerHTML = "Heal " + this.parentNode.rowIndex + this.cellIndex + "?";
-									clickedCharacter = playerTwo.getCharByToken(this.className);
-									specialAbilityParalyze(this,game,player,character);
+									//clickedCharacter = playerTwo.getCharByToken(this.className);
+									specialAbilityHeal(this,game,player,character);
 								}
-								if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
+								/* if(this.className.slice(1,2) == player.getPlayerNumber()){//if other owned character
 									removeGrid();
 									drawGrid(game,"tableDiv");
 									drawCharOptButtons(tile,game,player);
-								}
+								} */
 							});
 						}
 					}	
@@ -1304,6 +1320,7 @@ function specialAbilityHeal(tile,game,player,character){
 	var buttonCancel;
 	var healCost = 2;
 	
+	removeAllInfoButtons();
 	drawButton("buttonConfirm","infoDiv","Confirm");
 	drawButton("buttonCancel","infoDiv","Cancel");
 	
@@ -1316,11 +1333,20 @@ function specialAbilityHeal(tile,game,player,character){
 			healTarget = player.getCharByToken(tile.className);
 			
 			healedAmount = character.heal(healTarget);
-			healTarget.setCurrentHP(healedAmount + healTarget.getCurrentHP);
+			if(healTarget.getCurrentHP() + healedAmount >= healTarget.getHP()){
+				healTarget.setCurrentHP(healTarget.getHP());
+			}
+			else{				
+				healTarget.setCurrentHP(healedAmount + healTarget.getCurrentHP());
+			}
 			
 			character.setCurrentAP(character.getCurrentAP() - healCost);
 			
 			info.innerHTML = "The character was healed: " + healedAmount;
+			removeAllInfoButtons();
+			setTimeout(function(){
+				drawCharOptButtons(tile,game,player);
+			},1500)
 		}
 	});
 	
